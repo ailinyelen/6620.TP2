@@ -199,7 +199,7 @@ unsigned int find_earliest(unsigned int setnum)
 			{
 				if 
 					((viaearliest.cargada == 1)
-					&& (viaearliest.time_stamp < viacandidata.time_stamp))
+					&& (viaearliest.time_stamp > viacandidata.time_stamp))
 				{
 					ret = cont;
 					viaearliest = viacandidata;
@@ -397,6 +397,7 @@ void write_byte(unsigned int address, char value, unsigned char *hit)
 		hit[0] = 0;
 	}
 
+	memoria.Bloque[set].vias[encontradoenvia].is_dirty = 1;
 	memoria.Bloque[set].vias[encontradoenvia].datos[offset] = value;
 	
 }
@@ -418,9 +419,28 @@ char get_miss_rate()
 void mostrarcache()
 {
 	int cont = 0;
+	int contVias = 0;
+	
 	printf("ESTADO CACHE\n");
 	for (cont = 0; cont < memoria.cantidadbloques; cont++)
-		printf("%d   ----     %d - %d \n" , cont , memoria.Bloque[cont].vias[0].tag, memoria.Bloque[cont].vias[1].tag);
+	{
+		printf("%d   ----   ", cont);
+		
+		for (contVias = 0; contVias < memoria.cantidadvias; contVias++)
+		{
+			printf("Via %d : ", contVias);
+			if (memoria.Bloque[cont].vias[contVias].cargada == 1)
+				printf("%d D: %d", memoria.Bloque[cont].vias[contVias].tag, memoria.Bloque[cont].vias[contVias].is_dirty);
+			else
+				printf("NL");
+				
+			printf("     ");
+		}
+	
+		printf("\n");
+	
+	}
+	
 }
 
 
@@ -429,15 +449,10 @@ int main(int argc, char *argv[])
 {
 
 	char miss = 0;
-	
 	memoria.bitsoffset = 4;
 	memoria.capaciadbloques = 16;
-	
-	
 	memoria.bitsindex = 4;
 	memoria.cantidadbloques = 16;
-	
-	
 	memoria.cantidadvias = 2;
 	memoria.bitstag = 24;
 	
@@ -446,6 +461,15 @@ int main(int argc, char *argv[])
 
 	init();
 	
+	write_byte(256, 1, &miss);
+	//read_byte(256, &miss);
+	read_byte(512, &miss);
+	read_byte(1024, &miss);
+	
+	mostrarcache();
+	
+	
+	/*
 	mostrarcache();
 	read_byte(0, &miss);
 	
@@ -454,9 +478,12 @@ int main(int argc, char *argv[])
 	
 	read_byte(512, &miss);
 	mostrarcache();
-	read_byte(1024, &miss);
+	read_byte(768, &miss);
 	mostrarcache();
 	
+	read_byte(1024, &miss);
+	mostrarcache();
+	*/
 	/*
 
 	UN MISS Y UN HIT
@@ -477,5 +504,4 @@ int main(int argc, char *argv[])
 
 	return 0;
 }
-
 
