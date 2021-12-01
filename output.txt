@@ -1,0 +1,7 @@
+W 34567 86
+MISS
+R 45352
+data: 0 -MISS
+R 34564
+data: 0 -HIT
+MISS RATE: 66
