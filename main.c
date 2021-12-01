@@ -4,8 +4,7 @@
 #include <math.h>
 
 #define ERROR -1
-#define BYTE_MEMORIA 65536
-#define BITS_DIR_MEM 16
+#define BITS_DIR_MEM 20
 
 
 char * ByteMemoria;
@@ -435,19 +434,46 @@ void mostrarcache()
 }
 
 
-
-int main(int argc, char *argv[]) {
-
-	char* output_file_name = NULL;
-    int ways = -1, block_size = -1, cache_size = -1;
-
-    for (int i = 1; i < argc-2; i++) {
-
-		if (strcmp(argv[i],"-h") == 0 || strcmp(argv[i] , "--help") == 0) {
+void print_help()
+{
 			fprintf (stdout, "Usage: \n tp2 -h \n tp2 -V \n tp2 options archivo \nOptions: \n -h, --help  ~Imprime ayuda.\n");
 			fprintf (stdout, " -V, --version ~Version del programa.\n -o, --output ~Archivo de salida.\n");
 			fprintf (stdout, " -w, --ways ~Cantidad de vias.\n -c, --cachesize ~Cantidad de kilobytes del cache.");
 			fprintf (stdout, "\n -b, --blocksize ~Cantidad de bytes del bloque.\nExamples:\n tp2 -w 4 -cs 8 -bs 16 prueba1.mem\n");
+	
+}
+
+int main(int argc, char *argv[]) {
+
+
+
+	char* output_file_name = NULL;
+    int ways = -1, block_size = -1, cache_size = -1;
+    int i = 0;
+
+	if (argc > 1)
+	{
+		if (strcmp(argv[1],"-h") == 0 || strcmp(argv[1] , "--help") == 0)
+		{
+			print_help();		
+			return 0;
+		}
+	}
+
+/*
+Se debera incluir la salida que produzca el programa con los siguientes
+archivos de prueba, para las siguientes caches: [4 KB, 4WSA, 32bytes] y
+[16KB, una va, 128 bytes].
+	tp2 -w 4 -c 4 -b 32 prueba5.mem
+	tp2 -w 1 -c 16 -b 4 prueba5.mem
+
+*/
+
+    for (i = 1; i < argc-2; i++) 
+	{
+		if (strcmp(argv[i],"-h") == 0 || strcmp(argv[i] , "--help") == 0) 
+		{
+			print_help();
 			return 0;
 		}
 		else if (strcmp(argv[i] , "-V") == 0 || strcmp(argv[i] , "--version") == 0) {
@@ -462,7 +488,7 @@ int main(int argc, char *argv[]) {
 			i++;
 			ways = atoi(argv[i]);
 		}
-		else if (strcmp(argv[i] , "-cs") == 0 || strcmp(argv[i] , "--cachesize") == 0) {
+		else if (strcmp(argv[i] , "-c") == 0 || strcmp(argv[i] , "--cachesize") == 0) {
 			i++;
 			int argument = atoi(argv[i]);
 			if (argument <= 0) {
@@ -472,7 +498,7 @@ int main(int argc, char *argv[]) {
 			int bits = 10 + (log(argument)/log(2));
 			cache_size = pow(2, bits);
 		}
-		else if (strcmp(argv[i] , "-bs") == 0 || strcmp(argv[i] , "--blocksize") == 0) {
+		else if (strcmp(argv[i] , "-b") == 0 || strcmp(argv[i] , "--blocksize") == 0) {
 			i++;
 			block_size = atoi(argv[i]);
 		}
@@ -504,7 +530,8 @@ int main(int argc, char *argv[]) {
     fprintf (stdout, "#vias %d\n ", ways);
     fprintf (stdout, "%d bits de TAG, %d bits de INDEX, %d bits de OFFSET\n", bits_tag, bits_index, bits_offset);
     
-	ByteMemoria = malloc(sizeof(char) * BYTE_MEMORIA);
+    int BYTE_MEMORIA = pow(2, BITS_DIR_MEM);
+	ByteMemoria = malloc(sizeof(char) *  BYTE_MEMORIA);
 
     char* input_file_name = argv[argc-1]; 
     FILE* input_file = fopen(input_file_name, "r");
@@ -519,18 +546,36 @@ int main(int argc, char *argv[]) {
 			fprintf(stderr, "Error while opening output file %s\n", output_file_name);
 			return 1;
 		}
+		
+		/*
+		
+		ESTO NO ME COMPILA
 		stdout = output_file;
 		stderr = output_file;
+		*/
 	}
 
-    char x[6];
+
+	// INICIALIZO LA MEMORIA CACHE
+    init();	
+
+
+	char x[6];
 	int memory_pos;
 	unsigned char hit = 0;
-
-    while (fscanf(input_file, "%5s", x)!= EOF) {
-        if (strcmp(x, "init") == 0) 
-		init();
-		else if (strcmp(x, "R") == 0) {
+	
+	
+    while (fscanf(input_file, "%5s", x)!= EOF) 
+	{
+        if (strcmp(x, "init") == 0)
+		{
+			// Borra la memoria y la vuelve a crear
+			end();
+			init();
+		
+		} 
+		else if (strcmp(x, "R") == 0) 
+		{
 			fscanf(input_file, "%d", &memory_pos);
 			//PRINTS PARA CHEQUEO - ELIMINAR
 			fprintf(stdout, "R %d\n", memory_pos);
@@ -539,8 +584,8 @@ int main(int argc, char *argv[]) {
 			if (hit == 1) fprintf(stdout, " -HIT\n");
 			else fprintf (stdout, " -MISS\n");
 		}
-		else if (strcmp(x, "W") == 0) {
-			
+		else if (strcmp(x, "W") == 0) 
+		{
 			fscanf(input_file, "%7s", x);
 			char* number = strtok(x, ",");
 			memory_pos = atoi(number);
@@ -554,7 +599,8 @@ int main(int argc, char *argv[]) {
 			if (hit == 1) fprintf(stdout, "HIT\n");
 			else fprintf (stdout, "MISS\n");
 		}
-		else if (strcmp(x, "MR") == 0) {			
+		else if (strcmp(x, "MR") == 0) 
+		{			
 			char mr = get_miss_rate();
 			fprintf(stdout, "MISS RATE: %d\n", mr);
 		}
@@ -562,6 +608,7 @@ int main(int argc, char *argv[]) {
 
     fclose(input_file);
 	free(ByteMemoria);
+	end();
 
 	return 0;
 }
