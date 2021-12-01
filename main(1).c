@@ -498,14 +498,13 @@ int main(int argc, char *argv[]) {
     int bits_tag = BITS_DIR_MEM - bits_index - bits_offset;
 	memoria.bitstag = bits_tag;
 	
+	//PRINTS PARA CHEQUEO - ELIMINAR
     fprintf (stdout, "cache de %d Bytes\n", cache_size);
     fprintf (stdout, "#conjuntos %d de %d Bytes cada bloque\n", conjuntos, block_size);
     fprintf (stdout, "#vias %d\n ", ways);
     fprintf (stdout, "%d bits de TAG, %d bits de INDEX, %d bits de OFFSET\n", bits_tag, bits_index, bits_offset);
-
     
 	ByteMemoria = malloc(sizeof(char) * BYTE_MEMORIA);
-
 
     char* input_file_name = argv[argc-1]; 
     FILE* input_file = fopen(input_file_name, "r");
@@ -533,6 +532,7 @@ int main(int argc, char *argv[]) {
 		init();
 		else if (strcmp(x, "R") == 0) {
 			fscanf(input_file, "%d", &memory_pos);
+			//PRINTS PARA CHEQUEO - ELIMINAR
 			fprintf(stdout, "R %d\n", memory_pos);
 			char data = read_byte(memory_pos, &hit);
 			fprintf (stdout, "data: %d", data);
@@ -547,7 +547,7 @@ int main(int argc, char *argv[]) {
 			
 			int value;
 			fscanf(input_file, "%d", &value);
-
+			//PRINTS PARA CHEQUEO - ELIMINAR
 			fprintf(stdout, "W %d %d\n", memory_pos, value);
 			
 			write_byte(memory_pos, value, &hit);
@@ -565,4 +565,3 @@ int main(int argc, char *argv[]) {
 
 	return 0;
 }
-
