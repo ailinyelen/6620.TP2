@@ -139,7 +139,7 @@ int main(int argc, char *argv[]) {
 
 
 	char x[6];
-	int memory_pos;
+	int memory_pos = 0;
 	unsigned char hit = 0;
 	
 	
