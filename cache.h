@@ -2,6 +2,7 @@
 #define MEMORY_SIZE 65536
 #define OK 0
 #define ERROR 1
+#define NO_MISS_RATE '-'
 #define EFES 0xFFFFFFFF
 
 

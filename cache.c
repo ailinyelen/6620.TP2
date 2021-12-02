@@ -23,6 +23,8 @@ int begin (int block_size, int ways, int cache_size) {
 	cache.bitsoffset = bits_offset(block_size); 
 	cache.bitsindex = bits_index(cache.cantidadbloques);
     cache.bitstag = BITS_DIR_MEM - cache.bitsindex - cache.bitsoffset;
+	cache.lecturas = 0;
+    cache.misses = 0;
 
 	Memoria_principal = malloc(sizeof(char) *  MEMORY_SIZE);
 	if (Memoria_principal == NULL) return ERROR;
@@ -424,5 +426,6 @@ a traves de las otras primitivas.
 */
 char get_miss_rate()
 {
+	if (cache.lecturas == 0) return NO_MISS_RATE;
 	return (cache.misses * 100) /  cache.lecturas ;
 }

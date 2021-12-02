@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
 				break;
 			
 			default:
-				fprintf (stderr, "ERROR: Unknown option. Use -h or --help if needed.\n");
+				fprintf (stderr, "Use -h or --help if needed.\n");
 				return ERROR;
 		}
 
@@ -183,7 +183,8 @@ int main(int argc, char *argv[]) {
 		else if (strcmp(x, "MR") == 0) 
 		{			
 			char mr = get_miss_rate();
-			fprintf(stdout, "MISS RATE: %d\n", mr);
+			if (mr == NO_MISS_RATE) fprintf(stdout, "MISS RATE: NO DATA\n");
+			else fprintf(stdout, "MISS RATE: %d\n", mr);
 		}
     }
 
